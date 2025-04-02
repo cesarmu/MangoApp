@@ -13,7 +13,7 @@ builder.Services.AddHttpClient<IProductService, IProductService>();
 builder.Services.AddHttpClient<ICouponService, ICouponService>();
 builder.Services.AddHttpClient<IAuthService, IAuthService>();
 
-
+//Urls de las APIs
 SD.ProductAPIBase = builder.Configuration["ServiceUrls:ProductAPI"];
 SD.CouponAPIBase = builder.Configuration["ServiceUrls:CouponAPI"];
 SD.AuthAPIBase = builder.Configuration["ServiceUrls:AuthAPI"];
@@ -31,8 +31,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             options.LoginPath = "/Auth/Login";
             options.AccessDeniedPath = "/Auth/AccessDenied";
         });
-
-
 
 var app = builder.Build();
 
