@@ -365,3 +365,6 @@ FodyWeavers.xsd
 # Edited by me
 appsettings.json
 appsettings.Development.json
+
+#
+SQL Server Container.txt
