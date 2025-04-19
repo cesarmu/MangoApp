@@ -13,7 +13,6 @@ namespace Mango.Services.CouponAPI.Controllers
     public class CouponAPIController : ControllerBase
     {
         private readonly AppDbContext _db;
-
         private ResponseDto _response;
         private IMapper _mapper;
 
