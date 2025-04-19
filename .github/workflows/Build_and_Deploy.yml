@@ -18,7 +18,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     outputs:
-      output1: ${{ steps.isWebAppChanged.outputs.value }}
+      output1: ${{ steps.isWebAppChanged.outputs.test }}
 
     steps:
       - uses: actions/checkout@v4
@@ -65,7 +65,7 @@ jobs:
         run: |
             cd Mango.Web
             echo 'Cambios en Web App.'
-            run: echo "value=true" >> "$GITHUB_OUTPUT"
+            run: echo "test=true" >> "$GITHUB_OUTPUT"
 
   deploy:
     name: Deploy Web App to Azure 
