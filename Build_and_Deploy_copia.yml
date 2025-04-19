@@ -65,13 +65,57 @@ jobs:
         run: |
             cd Mango.Web
             echo 'Cambios en Web App.'
-            echo "::set-output name=value::true"
+            echo 'value=true' >> "$GITHUB_OUTPUT"
 
-            dotnet publish ${{ env.APP_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.PUBLISH_DIR }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: webapp
-          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+###Auth API
+      - name: Auth API steps start here
+        if: steps.filter.outputs.mango_auth_api == 'true'
+        env:
+          AZURE_WEBAPP_NAME: mango-auth-api
+          AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Services.AuthAPI/publish"
+          APP_PROJECT_PATH: "Mango.Services.AuthAPI"        
+        run: |
+            cd Mango.Services.AuthAPI
+            echo 'Cambios en Auth API'
+
+###Coupon API
+      - name: Coupon API steps start here
+        if: steps.filter.outputs.mango_product_api == 'true'
+        env:
+          AZURE_WEBAPP_NAME: mango-coupon-api
+          AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Services.CouponAPI/publish"
+          APP_PROJECT_PATH: "Mango.Services.CouponAPI"      
+        run: |
+            cd Mango.Services.CouponAPI
+            echo 'Cambios en Coupon API'      
+
+###Product API
+      - name: Product API steps start here
+        if: steps.filter.outputs.mango_product_api == 'true'
+        env:
+          AZURE_WEBAPP_NAME: mango-product-api
+          AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Services.ProductAPI/publish"
+          APP_PROJECT_PATH: "Mango.Services.ProductAPI"     
+        run: |
+            cd Mango.Services.ProductAPI
+            echo 'Cambios en Product API'       
+
+###Shopping Cart API
+      - name: Shopping Cart API steps start here
+        if: steps.filter.outputs.mango_shopping_cart_api == 'true'
+        env:
+          AZURE_WEBAPP_NAME: mango-shopping-cart-api
+          AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Services.ShoppingCartAPI/publish"
+          APP_PROJECT_PATH: "Mango.Services.ShoppingCartAPI"
+        run: |
+            cd Mango.Services.ShoppingCartAPI
+            echo 'Cambios en Shopping Cart API'          
+
+      - name: Publish Web App
+        if: steps.isWebAppChanged.outputs.value == 'true'
+        run: echo ${{ steps.isWebAppChanged.outputs.value }}
+
+
 
       - name: Publish
         run: dotnet publish ${{ env.APP_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.PUBLISH_DIR }}
@@ -81,7 +125,7 @@ jobs:
         with:
           name: webapp
           path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-
+          
   deploy:
     name: Deploy Web App to Azure 
     runs-on: ubuntu-latest
@@ -90,11 +134,6 @@ jobs:
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
-        if: steps.isWebAppChanged.output.value == true
-        run: echo ${{ steps.isWebAppChanged.output.value }}
-        
-        
-        
         with:
           name: webapp
           path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
