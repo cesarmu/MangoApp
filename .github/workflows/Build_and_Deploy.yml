@@ -65,7 +65,7 @@ jobs:
         run: |
             cd Mango.Web
             echo 'Cambios en Web App.'
-            run: echo "test=true" >> "$GITHUB_OUTPUT"
+            echo "test=true" >> "$GITHUB_OUTPUT"
 
   deploy:
     name: Deploy Web App to Azure 
