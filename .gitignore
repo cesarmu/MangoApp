@@ -368,3 +368,5 @@ appsettings.Development.json
 
 #
 SQL_Server_Container.txt
+Build_and_Deploy.yml
+Build_and_Deploy_copia.yml
