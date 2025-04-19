@@ -52,7 +52,7 @@ jobs:
 
 ###Coupon API
       - name: Coupon API steps start here
-        if: steps.filter.outputs.mango_product_api == 'true'
+        if: steps.filter.outputs.mango_coupon_api == 'true'
         run: |
             cd Mango.Services.CouponAPI
             echo 'Cambios en Coupon API'
