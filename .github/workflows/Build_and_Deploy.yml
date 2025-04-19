@@ -7,16 +7,18 @@ on:
       - master
 
 env:
-  AZURE_WEBAPP_NAME: mango-web-app
-  AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
+  #AZURE_WEBAPP_NAME: mango-web-app
+  #AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
   DOTNET_VERSION: "9.x"
   SOLUTION_PATH: "Mango.sln"
-  APP_PROJECT_PATH: "Mango.Web"
+  #APP_PROJECT_PATH: "Mango.Web"
   PUBLISH_DIR: "./publish"
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.isWebAppChanged.outputs.value }}
 
     steps:
       - uses: actions/checkout@v4
@@ -36,12 +38,35 @@ jobs:
             mango_shopping_cart_api:
               - 'Mango.Services.ShoppingCartAPI/**'
 
+###Esto es común para todos los despliegues
+#      - name: Setup .NET
+#        uses: actions/setup-dotnet@v4
+#        with:
+#          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+#      - name: Restore
+#        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+#      - name: Build
+#        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+
+#      - name: Test
+#        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-restore --no-build --verbosity normal
+              
+
 ###Web App
       - name: Web App steps start here
+        id: isWebAppChanged
         if: steps.filter.outputs.mango_web_app == 'true'
         run: |
             cd Mango.Web
             echo 'Cambios en Web App.'
+            echo 'value=true' >> "$GITHUB_OUTPUT"
+        env:
+          AZURE_WEBAPP_NAME: mango-web-app
+          AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
+          APP_PROJECT_PATH: "Mango.Web"
+    
 
 ###Auth API
       - name: Auth API steps start here
@@ -49,13 +74,21 @@ jobs:
         run: |
             cd Mango.Services.AuthAPI
             echo 'Cambios en Auth API'
+        env:
+          AZURE_WEBAPP_NAME: mango-auth-api
+          AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Services.AuthAPI/publish"
+          APP_PROJECT_PATH: "Mango.Services.AuthAPI"
 
 ###Coupon API
       - name: Coupon API steps start here
-        if: steps.filter.outputs.mango_coupon_api == 'true'
+        if: steps.filter.outputs.mango_product_api == 'true'
         run: |
             cd Mango.Services.CouponAPI
             echo 'Cambios en Coupon API'
+        env:
+          AZURE_WEBAPP_NAME: mango-coupon-api
+          AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Services.CouponAPI/publish"
+          APP_PROJECT_PATH: "Mango.Services.CouponAPI"            
 
 ###Product API
       - name: Product API steps start here
@@ -63,3 +96,18 @@ jobs:
         run: |
             cd Mango.Services.ProductAPI
             echo 'Cambios en Product API'
+        env:
+          AZURE_WEBAPP_NAME: mango-product-api
+          AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Services.ProductAPI/publish"
+          APP_PROJECT_PATH: "Mango.Services.ProductAPI"            
+
+###Shopping Cart API
+      - name: Shopping Cart API steps start here
+        if: steps.filter.outputs.mango_shopping_cart_api == 'true'
+        run: |
+            cd Mango.Services.ShoppingCartAPI
+            echo 'Cambios en Shopping Cart API'
+        env:
+          AZURE_WEBAPP_NAME: mango-shopping-cart-api
+          AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Services.ShoppingCartAPI/publish"
+          APP_PROJECT_PATH: "Mango.Services.ShoppingCartAPI"
