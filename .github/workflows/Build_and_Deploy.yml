@@ -65,7 +65,7 @@ jobs:
         run: |
             cd Mango.Web
             echo 'Cambios en Web App.'
-            echo "::set-output name=value::true"
+            run: echo "value=true" >> "$GITHUB_OUTPUT"
 
   deploy:
     name: Deploy Web App to Azure 
@@ -75,5 +75,7 @@ jobs:
     steps:
       - name: Download artifact from build job
         #uses: actions/download-artifact@v4
-        if: steps.isWebAppChanged.output.value == true
-        run: echo ${{ steps.isWebAppChanged.output.value }}
+        #if: steps.isWebAppChanged.output.value == true
+      - env:  
+          OUTPUT1: ${{ needs.build-and-test.outputs.output1 }}
+        run: echo "$OUTPUT1"
