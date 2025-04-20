@@ -48,10 +48,10 @@ jobs:
     name: build-and-test-web-app start here
     runs-on: ubuntu-latest
     steps:
-      - env:
-          AZURE_WEBAPP_NAME: mango-web-app
-          AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
-          APP_PROJECT_PATH: "Mango.Web"
+#      - env:
+#          AZURE_WEBAPP_NAME: mango-web-app
+#          AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
+#          APP_PROJECT_PATH: "Mango.Web"
 
       - uses: actions/checkout@v4
 
