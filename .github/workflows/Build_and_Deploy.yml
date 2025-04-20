@@ -15,13 +15,16 @@ env:
   PUBLISH_DIR: "./publish"
 
 jobs:
-  build-and-test:
+  changes:
     runs-on: ubuntu-latest
     outputs:
-      output1: ${{ steps.isWebAppChanged.outputs.test }}
+      web-app: ${{ steps.filter.outputs.mango_web_app }}
+      auth-api: ${{ steps.filter.outputs.mango_auth_api }}
+      coupon-api: ${{ steps.filter.outputs.mango_coupon_api }}
+      product-api: ${{ steps.filter.outputs.mango_product_api }}
+      shopping-cart-api: ${{ steps.filter.outputs.mango_shopping_cart_api }}
 
     steps:
-      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
 
         id: filter
@@ -38,44 +41,59 @@ jobs:
             mango_shopping_cart_api:
               - 'Mango.Services.ShoppingCartAPI/**'
 
-###Esto es común para todos los despliegues
-#      - name: Setup .NET
-#        uses: actions/setup-dotnet@v4
-#        with:
-#          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-#      - name: Restore
-#        run: dotnet restore ${{ env.SOLUTION_PATH }}
-
-#      - name: Build
-#        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
-
-#      - name: Test
-#        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-restore --no-build --verbosity normal
-              
-
-###Web App
-      - name: Web App steps start here
-        id: isWebAppChanged
-        if: steps.filter.outputs.mango_web_app == 'true'
-        env:
+###Build and Test Web App
+  build-and-test-web-app:
+    needs: changes
+    if: ${{ needs.changes.outputs.web-app }}
+    name: build-and-test-web-app start here
+    runs-on: ubuntu-latest
+    steps:
+      - env:
           AZURE_WEBAPP_NAME: mango-web-app
           AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
-          APP_PROJECT_PATH: "Mango.Web"        
-        run: |
-            cd Mango.Web
-            echo 'Cambios en Web App.'
-            echo "test=true" >> "$GITHUB_OUTPUT"
+          APP_PROJECT_PATH: "Mango.Web"
 
-  deploy:
-    name: Deploy Web App to Azure 
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-restore --no-build --verbosity normal
+
+      #- name: Publish
+      #  run: dotnet publish ${{ env.APP_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.PUBLISH_DIR }}
+
+      #- name: Publish Artifacts
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: webapp
+      #    path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+  deploy-web-app:
+    name: Deploy Web App to Azure
+    if: ${{ needs.changes.outputs.web-app }} 
     runs-on: ubuntu-latest
-    needs: [build-and-test]
+    needs: [build-and-test-web-app]
 
     steps:
       - name: Download artifact from build job
         #uses: actions/download-artifact@v4
-        #if: steps.isWebAppChanged.output.value == true
-        env:  
-          OUTPUT1: ${{ needs.build-and-test.outputs.output1 }}
-        run: echo "$OUTPUT1"
+        #with:
+        #  name: webapp
+        #  path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          
+      - name: Deploy
+        #uses: azure/webapps-deploy@v2
+        #with:
+        #  app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        #  publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        #  package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
