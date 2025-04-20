@@ -62,7 +62,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore
-        run: dotnet restore ./Mango.Web/Mango.Web.csproj
+        run: dotnet restore ./MangoApp/MAngoApp/Mango.Web/Mango.Web.csproj
         #run: dotnet restore ${{ env.SOLUTION_PATH }}
 
       #- name: Build
