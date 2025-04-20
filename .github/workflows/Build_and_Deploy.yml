@@ -108,7 +108,7 @@ jobs:
 ###Build and Test Auth API
   build-and-test-auth-api:
     needs: changes
-    if: ${{ needs.changes.outputs.web-app == 'true' }}
+    if: ${{ needs.changes.outputs.auth-api == 'true' }}
     name: build-and-test-auth-api start here
     runs-on: ubuntu-latest
     steps:
