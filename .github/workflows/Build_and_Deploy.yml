@@ -56,7 +56,7 @@ jobs:
           AZURE_WEBAPP_NAME: mango-web-app
           AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
           APP_PROJECT_PATH: "Mango.Web"
-          SOLUTION_PATH: ./Mango.Web/Mango.Web.csproj
+          SOLUTION_PATH: "./Mango.Web/Mango.Web.csproj"
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
