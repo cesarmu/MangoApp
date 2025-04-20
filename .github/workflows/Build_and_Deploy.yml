@@ -50,6 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set Env Variables
+        run: echo "Set Env Variables"
         env:
           AZURE_WEBAPP_NAME: mango-web-app
           AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
