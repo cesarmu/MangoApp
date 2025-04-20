@@ -30,6 +30,7 @@ jobs:
 
         id: filter
         with:
+          base: ${{ github.ref }}
           filters: |
             mango_web_app:
               - 'Mango.Web/**'
