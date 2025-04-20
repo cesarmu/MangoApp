@@ -7,11 +7,11 @@ on:
       - master
 
 env:
-  AZURE_WEBAPP_NAME: mango-web-app
-  AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
+  #AZURE_WEBAPP_NAME: mango-web-app
+  #AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
   DOTNET_VERSION: "8.x"
   SOLUTION_PATH: "Mango.sln"
-  APP_PROJECT_PATH: "Mango.Web"
+  #APP_PROJECT_PATH: "Mango.Web"
   PUBLISH_DIR: "./publish"
 
 jobs:
@@ -30,7 +30,6 @@ jobs:
 
         id: filter
         with:
-          base: ${{ github.ref }}
           filters: |
             mango_web_app:
               - 'Mango.Web/**'
@@ -63,7 +62,8 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore
-        run: dotnet restore ${{ env.SOLUTION_PATH }}
+        run: ls $GITHUB_WORKSPACE
+          #dotnet restore ${{ env.SOLUTION_PATH }}
 
       #- name: Build
       #  run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
