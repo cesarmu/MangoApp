@@ -1,0 +1,112 @@
+name: Mango App
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+env:
+  AZURE_WEBAPP_NAME: mango-web-app
+  AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
+  DOTNET_VERSION: "9.x"
+  SOLUTION_PATH: "Mango.sln"
+  APP_PROJECT_PATH: "Mango.Web"
+  PUBLISH_DIR: "./publish"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+
+        id: filter
+        with:
+          filters: |
+            mango_web_app:
+              - 'Mango.Web/**'
+            mango_auth_api:
+              - 'Mango.Services.AuthAPI/**'
+            mango_coupon_api:
+              - 'Mango.Services.CouponAPI/**'
+            mango_product_api:
+              - 'Mango.Services.ProductAPI/**'
+            mango_shopping_cart_api:
+              - 'Mango.Services.ShoppingCartAPI/**'
+
+###Web App
+      - name: Web App steps start here
+        if: steps.filter.outputs.mango_web_app == 'true'
+        run: |
+            cd Mango.Web
+            echo 'Cambios en Web App.'
+
+###Auth API
+      - name: Auth API steps start here
+        if: steps.filter.outputs.mango_auth_api == 'true'
+        run: |
+            cd Mango.Services.AuthAPI
+            echo 'Cambios en Auth API'
+
+###Coupon API
+      - name: Coupon API steps start here
+        if: steps.filter.outputs.mango_product_api == 'true'
+        run: |
+            cd Mango.Services.CouponAPI
+            echo 'Cambios en Coupon API'
+
+###Product API
+      - name: Product API steps start here
+        if: steps.filter.outputs.mango_product_api == 'true'
+        run: |
+            cd Mango.Services.ProductAPI
+            echo 'Cambios en Product API'
+
+
+
+
+
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-restore --no-build --verbosity normal
+
+      - name: Publish
+        run: dotnet publish ${{ env.APP_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.PUBLISH_DIR }}
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: webapp
+          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          
+  deploy:
+    name: Deploy Web App to Azure 
+    runs-on: ubuntu-latest
+    needs: [buid-and-test]
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: webapp
+          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          
+      - name: Deploy
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"

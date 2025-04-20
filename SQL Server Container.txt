@@ -1,0 +1,42 @@
+
+
+
+mango-sql-server
+sql-admin-01
+@dm1n210325
+
+Server=tcp:mango-sql-server.database.windows.net,1433;Initial Catalog=Mango_Auth;Persist Security Info=False;User ID=sql-admin-01;Password=@dm1n210325;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=tcp:mango-sql-server.database.windows.net,1433;Initial Catalog=Mango_Auth;Persist Security Info=False;User ID=sql-admin-01;Password=@dm1n210325;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30"
+  }
+
+docker cp "sqlserver:/var/opt/mssql/data/Mango_Auth-2025412-17-42-31.bak" "D:\Cesar\SqlServer\Mango"
+
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Database=Mango_Auth;Trusted_Connection=False;TrustServerCertificate=True;user id=sa;pwd=M1cr0SQLP@55w0rd"
+  }
+
+
+
+
+***********************************************************************************************
+
+https://youtu.be/Y7CMbve-Mos
+
+-Descargar SQL Server container
+
+docker pull mcr.microsoft.com/mssql/server:2019-latest
+
+-Correr contenedor
+
+docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=M1cr0SQLP@55w0rd" -p 1433:1433 --name sqlserver --hostname sqlserver -d mcr.microsoft.com/mssql/server:2019-latest 
+
+Docker stop sqlserver
+
+
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=(LocalDB)\\MSSQLLocalDB;Database=Mango_Coupon;TrustedConnection=True;TrustServerCertificate=True" 
+  }
