@@ -65,6 +65,7 @@ jobs:
         #run: dotnet restore ${{ env.SOLUTION_PATH }}
         run: echo ${GITHUB_WORKSPACE}
           echo ${{ env.SOLUTION_PATH }}
+          pwd
 
       #- name: Build
       #  run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
