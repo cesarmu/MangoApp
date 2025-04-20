@@ -49,7 +49,6 @@ namespace Mango.Web.Controllers
         }
 
 
-
         [Authorize(Roles = SD.RoleAdmin)]
         public IActionResult Privacy()
         {
