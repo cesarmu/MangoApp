@@ -10,7 +10,7 @@ env:
   #AZURE_WEBAPP_NAME: mango-web-app
   #AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
   DOTNET_VERSION: "9.x"
-  SOLUTION_PATH: Mango.sln
+  SOLUTION_PATH: "Mango.sln"
   #APP_PROJECT_PATH: "Mango.Web"
   PUBLISH_DIR: "./publish"
 
