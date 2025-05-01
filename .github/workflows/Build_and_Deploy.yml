@@ -88,19 +88,19 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        run: echo "Download artifact from build job"
-        #uses: actions/download-artifact@v4
-        #with:
-        #  name: webapp
-        #  path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        #run: echo "Download artifact from build job"
+        uses: actions/download-artifact@v4
+        with:
+          name: webapp
+          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
           
       - name: Deploy
-        run: echo "Deploy"
-        #uses: azure/webapps-deploy@v2
-        #with:
-        #  app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        #  publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        #  package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+        #run: echo "Deploy"
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
 
 ###Build and Test Auth API
   build-and-test-auth-api:
