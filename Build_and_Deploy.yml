@@ -9,9 +9,9 @@ on:
 env:
   #AZURE_WEBAPP_NAME: mango-web-app
   #AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
-  DOTNET_VERSION: "9.x"
-  SOLUTION_PATH: "Mango.sln"
-  #APP_PROJECT_PATH: "Mango.Web"
+  DOTNET_VERSION: "8.0.x"
+  #SOLUTION_PATH: "Mango.sln"
+  WEB_APP_PROJECT_PATH: "Mango.Web"
   PUBLISH_DIR: "./publish"
 
 jobs:
@@ -49,6 +49,7 @@ jobs:
     name: build-and-test-web-app start here
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Set Env Variables
         run: echo "Set Env Variables"
         env:
@@ -62,18 +63,16 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore
-        #run: dotnet restore ${{ env.SOLUTION_PATH }}
-        run: echo ${GITHUB_WORKSPACE}
-          echo ${{ env.SOLUTION_PATH }}
+        run: dotnet restore ./Mango.Web/Mango.Web.csproj
 
-      #- name: Build
-      #  run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+      - name: Build
+        run: dotnet build ./Mango.Web/Mango.Web.csproj --configuration Release --no-restore
 
-      #- name: Test
-      #  run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-restore --no-build --verbosity normal
+      - name: Test
+        run: dotnet test ./Mango.Web/Mango.Web.csproj --configuration Release --no-restore --no-build --verbosity normal
 
       #- name: Publish
-      #  run: dotnet publish ${{ env.APP_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.PUBLISH_DIR }}
+      #  run: dotnet publish ${{ env.WEB_APP_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.PUBLISH_DIR }}
 
       #- name: Publish Artifacts
       #  uses: actions/upload-artifact@v4
@@ -102,3 +101,41 @@ jobs:
         #  app-name: ${{ env.AZURE_WEBAPP_NAME }}
         #  publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
         #  package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+
+###Build and Test Auth API
+  build-and-test-auth-api:
+    needs: changes
+    if: ${{ needs.changes.outputs.auth-api == 'true' }}
+    name: build-and-test-auth-api start here
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set Env Variables
+        run: echo "Set Env Variables"
+        env:
+          AZURE_WEBAPP_NAME: mango-auth-api
+          AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Services.AuthAPI/publish"
+          APP_PROJECT_PATH: "Mango.Services.AuthAPI"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore ./Mango.Services.AuthAPI/Mango.Services.AuthAPI.csproj
+
+      - name: Build
+        run: dotnet build ./Mango.Services.AuthAPI/Mango.Services.AuthAPI.csproj --configuration Release --no-restore
+
+      #- name: Test
+      #  run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-restore --no-build --verbosity normal
+
+      #- name: Publish
+      #  run: dotnet publish ${{ env.APP_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.PUBLISH_DIR }}
+
+      #- name: Publish Artifacts
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: webapp
+      #    path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
