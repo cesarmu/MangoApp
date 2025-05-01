@@ -7,8 +7,8 @@ on:
       - master
 
 env:
-  #AZURE_WEBAPP_NAME: mango-web-app
-  #AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
+  AZURE_WEBAPP_NAME: mango-web-app
+  AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
   DOTNET_VERSION: "8.0.x"
   #SOLUTION_PATH: "Mango.sln"
   WEB_APP_PROJECT_PATH: "Mango.Web"
@@ -71,14 +71,14 @@ jobs:
       - name: Test
         run: dotnet test ./Mango.Web/Mango.Web.csproj --configuration Release --no-restore --no-build --verbosity normal
 
-      #- name: Publish
-      #  run: dotnet publish ${{ env.WEB_APP_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.PUBLISH_DIR }}
+      - name: Publish
+        run: dotnet publish ${{ env.WEB_APP_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.PUBLISH_DIR }}
 
-      #- name: Publish Artifacts
-      #  uses: actions/upload-artifact@v4
-      #  with:
-      #    name: webapp
-      #    path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: webapp
+          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
   deploy-web-app:
     name: Deploy Web App to Azure
