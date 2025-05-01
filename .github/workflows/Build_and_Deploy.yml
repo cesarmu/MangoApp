@@ -7,7 +7,8 @@ on:
       - master
 
 env:
-  AZURE_WEBAPP_NAME: mango-web-app
+  #AZURE_WEBAPP_NAME: mango-web-app
+  AZURE_WEBAPP_NAME: mangowebapptest
   AZURE_WEBAPP_PACKAGE_PATH: "./Mango.Web/publish"
   DOTNET_VERSION: "8.0.x"
   #SOLUTION_PATH: "Mango.sln"
