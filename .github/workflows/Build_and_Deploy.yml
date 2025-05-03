@@ -116,7 +116,7 @@ jobs:
   build-and-test-test-app:
     needs: changes
     if: ${{ needs.changes.outputs.test-api == 'true' }}
-    name: build-and-test-web-app start here
+    name: build-and-test-test-app start here
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
