@@ -33,6 +33,7 @@ jobs:
       shopping-cart-api: ${{ steps.filter.outputs.mango_shopping_cart_api }}
       test-api: ${{ steps.filter.outputs.mango_test_api }}
 
+    ##Review which projects had changes 
     steps:
       - uses: actions/checkout@v4    
       - uses: dorny/paths-filter@v3
@@ -53,7 +54,7 @@ jobs:
             mango_test_api:
               - 'Mango.Services.TestAPI/**'
 
-###Build and Test Web App
+###Build and Test Web App Start
   build-and-test-web-app:
     needs: changes
     if: ${{ needs.changes.outputs.web-app == 'true' }}
@@ -90,7 +91,10 @@ jobs:
         with:
           name: webapp
           path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        
+  ###Build and Test Web App Finished
 
+  ###Deploy Web App Starts
   deploy-web-app:
     name: Deploy Web App to Azure
     if: ${{ needs.changes.outputs.web-app == 'true'}} 
@@ -113,6 +117,9 @@ jobs:
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
 
+  ###Deploy Web App Finished
+  
+  ###Build and Test Test App Start
   build-and-test-test-app:
     needs: changes
     if: ${{ needs.changes.outputs.test-api == 'true' }}
@@ -149,10 +156,12 @@ jobs:
         with:
           name: testapp
           path: ${{ env.AZURE_TESTAPP_PACKAGE_PATH }}
-
+  ###Build and Test Test App Finished
+  
+  ###Deploy Test App Starts
   deploy-test-app:
     name: Deploy Test App to Azure
-    if: ${{ needs.changes.outputs.test-app == 'true'}} 
+    if: ${{ needs.changes.outputs.test-api == 'true'}} 
     runs-on: ubuntu-latest
     needs: [build-and-test-test-app]
 
@@ -171,6 +180,8 @@ jobs:
           app-name: ${{ env.AZURE_TESTAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_TESTAPP_PUBLISH_PROFILE }}
           package: "${{ env.AZURE_TESTAPP_PACKAGE_PATH }}"
+  ###Deploy Test App Finished
+  
 
 ###Build and Test Auth API
   build-and-test-auth-api:
