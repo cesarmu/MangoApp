@@ -15,6 +15,13 @@ env:
   WEB_APP_PROJECT_PATH: "Mango.Web"
   PUBLISH_DIR: "./publish"
 
+  AZURE_TESTAPP_NAME: mango-app-test
+  AZURE_TESTAPP_PACKAGE_PATH: "./Mango.Services.TestAPI/publish"
+  TEST_DOTNET_VERSION: "8.0.x"
+  #SOLUTION_PATH: "Mango.sln"
+  TEST_APP_PROJECT_PATH: "Mango.Services.TestAPI"
+  TEST_PUBLISH_DIR: "./publish"
+
 jobs:
   changes:
     runs-on: ubuntu-latest
@@ -24,6 +31,7 @@ jobs:
       coupon-api: ${{ steps.filter.outputs.mango_coupon_api }}
       product-api: ${{ steps.filter.outputs.mango_product_api }}
       shopping-cart-api: ${{ steps.filter.outputs.mango_shopping_cart_api }}
+      test-api: ${{ steps.filter.outputs.mango_test_api }}
 
     steps:
       - uses: actions/checkout@v4    
@@ -42,6 +50,8 @@ jobs:
               - 'Mango.Services.ProductAPI/**'
             mango_shopping_cart_api:
               - 'Mango.Services.ShoppingCartAPI/**'
+            mango_test_api:
+              - 'Mango.Services.TestAPI/**'
 
 ###Build and Test Web App
   build-and-test-web-app:
@@ -102,6 +112,65 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+
+  build-and-test-test-app:
+    needs: changes
+    if: ${{ needs.changes.outputs.test-api == 'true' }}
+    name: build-and-test-web-app start here
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set Env Variables
+        run: echo "Set Env Variables"
+        env:
+          AZURE_TESTAPP_NAME: mango-test-app
+          AZURE_TESTAPP_PACKAGE_PATH: "./Mango.Services.TestAPI/publish"
+          APP_PROJECT_PATH: "Mango.Services.TestAPI"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.TEST_DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore ./Mango.Services.TestAPI/Mango.Services.TestAPI.csproj
+
+      - name: Build
+        run: dotnet build ./Mango.Services.TestAPI/Mango.Services.TestAPI.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test ./Mango.Services.TestAPI/Mango.Services.TestAPI.csproj --configuration Release --no-restore --no-build --verbosity normal
+
+      - name: Publish
+        run: dotnet publish ${{ env.TEST_APP_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.TEST_PUBLISH_DIR }}
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: testapp
+          path: ${{ env.AZURE_TESTAPP_PACKAGE_PATH }}
+
+  deploy-test-app:
+    name: Deploy Test App to Azure
+    if: ${{ needs.changes.outputs.test-app == 'true'}} 
+    runs-on: ubuntu-latest
+    needs: [build-and-test-test-app]
+
+    steps:
+      - name: Download artifact from build job
+        #run: echo "Download artifact from build job"
+        uses: actions/download-artifact@v4
+        with:
+          name: testapp
+          path: ${{ env.AZURE_TESTAPP_PACKAGE_PATH }}
+          
+      - name: Deploy
+        #run: echo "Deploy"
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_TESTAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_TESTAPP_PUBLISH_PROFILE }}
+          package: "${{ env.AZURE_TESTAPP_PACKAGE_PATH }}"
 
 ###Build and Test Auth API
   build-and-test-auth-api:
